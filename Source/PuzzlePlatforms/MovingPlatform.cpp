@@ -19,6 +19,13 @@ void AMovingPlatform::BeginPlay()
 		SetReplicates(true); // replicate the actor itself (e.g. spawning)
 		SetReplicateMovement(true); // replicates the actor movement (e.g. position)
 	}
+
+	// GetActorLocation uses world space but TargetLocation is using local space because we set it through the
+	// transform widget whose origin is this class's (the platform's) origin.
+	// So we need to convert TargetLocation to worldspace.
+	// TransformPosition() transforms the location passed as an arg by the transform's location that it's called from.
+	GlobalStartLocation = GetActorLocation();
+	GlobalTargetLocation = GetTransform().TransformPosition(TargetLocation);
 }
 
 void AMovingPlatform::Tick(float DeltaSeconds)
@@ -28,15 +35,18 @@ void AMovingPlatform::Tick(float DeltaSeconds)
 	// Move the platform on the server only
 	if (HasAuthority())
 	{
-		FVector Location = GetActorLocation();
-		// GetActorLocation uses world space but TargetLocation is using local space because we set it through the
-		// transform widget whose origin is this class's origin. So we need to convert TargetLocation to worldspace.
-		// TransformPosition() transforms the location passed as an arg by the transform's location that it's called from.
+		FVector CurrentLocation = GetActorLocation();
+		float JourneyDistance = (GlobalTargetLocation - GlobalStartLocation).Size();
+		float DistanceTravelled = (CurrentLocation - GlobalStartLocation).Size();
+
+		if (DistanceTravelled > JourneyDistance)
+		{
+			Swap(GlobalStartLocation, GlobalTargetLocation);
+		}
 		
-		FVector TargetLocationGlobal = GetTransform().TransformPosition(TargetLocation);
-		FVector Direction = (TargetLocationGlobal - Location).GetSafeNormal();
-		Location +=  Direction * Speed * DeltaSeconds;
-		SetActorLocation(Location);
+		FVector Direction = (GlobalTargetLocation - GlobalStartLocation).GetSafeNormal();
+		CurrentLocation +=  Direction * Speed * DeltaSeconds;
+		SetActorLocation(CurrentLocation);
 	}
 
 }
