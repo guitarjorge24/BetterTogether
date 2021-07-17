@@ -29,7 +29,13 @@ void AMovingPlatform::Tick(float DeltaSeconds)
 	if (HasAuthority())
 	{
 		FVector Location = GetActorLocation();
-		Location += FVector(Speed * DeltaSeconds,0.f,0.f);
+		// GetActorLocation uses world space but TargetLocation is using local space because we set it through the
+		// transform widget whose origin is this class's origin. So we need to convert TargetLocation to worldspace.
+		// TransformPosition() transforms the location passed as an arg by the transform's location that it's called from.
+		
+		FVector TargetLocationGlobal = GetTransform().TransformPosition(TargetLocation);
+		FVector Direction = (TargetLocationGlobal - Location).GetSafeNormal();
+		Location +=  Direction * Speed * DeltaSeconds;
 		SetActorLocation(Location);
 	}
 
