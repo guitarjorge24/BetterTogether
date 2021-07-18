@@ -31,22 +31,35 @@ void AMovingPlatform::BeginPlay()
 void AMovingPlatform::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	// Move the platform on the server only
-	if (HasAuthority())
+	
+	// Move platforms if there's enough triggers activated
+	if (ActiveTriggers >= TriggersNeeded)
 	{
+		// Move the platform on the server only
+		if (!HasAuthority()) { return; }
+
 		FVector CurrentLocation = GetActorLocation();
 		float JourneyDistance = (GlobalTargetLocation - GlobalStartLocation).Size();
 		float DistanceTravelled = (CurrentLocation - GlobalStartLocation).Size();
 
+		// Make the tigger move back to it's starting location once it reaches it's destination.
 		if (DistanceTravelled > JourneyDistance)
 		{
 			Swap(GlobalStartLocation, GlobalTargetLocation);
 		}
-		
+
 		FVector Direction = (GlobalTargetLocation - GlobalStartLocation).GetSafeNormal();
-		CurrentLocation +=  Direction * Speed * DeltaSeconds;
+		CurrentLocation += Direction * Speed * DeltaSeconds;
 		SetActorLocation(CurrentLocation);
 	}
+}
 
+void AMovingPlatform::AddActiveTrigger()
+{
+	ActiveTriggers++;
+}
+
+void AMovingPlatform::SubtractActiveTrigger()
+{
+	ActiveTriggers--;
 }
