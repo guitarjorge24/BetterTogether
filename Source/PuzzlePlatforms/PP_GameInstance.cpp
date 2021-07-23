@@ -22,6 +22,13 @@ void UPP_GameInstance::Init()
 	UE_LOG(LogTemp, Warning, TEXT("Found class %s"), *MenuClass->GetName());
 }
 
+void UPP_GameInstance::LoadMenu()
+{
+	UUserWidget* Menu = CreateWidget<UUserWidget>(this, MenuClass);
+	if (!ensure(Menu)) { return; }
+	Menu->AddToViewport();
+}
+
 void UPP_GameInstance::Host()
 {
 	if (ensure(GEngine))
