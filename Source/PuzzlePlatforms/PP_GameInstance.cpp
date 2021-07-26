@@ -1,6 +1,7 @@
 // Copyright of Jorge Luque
 
 #include "PP_GameInstance.h"
+#include "MenuSystem/MainMenu.h"
 
 #include "PlatformTrigger.h"
 #include "Engine/Engine.h"
@@ -24,21 +25,10 @@ void UPP_GameInstance::Init()
 
 void UPP_GameInstance::LoadMenu()
 {
-	UUserWidget* Menu = CreateWidget<UUserWidget>(this, MenuClass);
+	Menu = CreateWidget<UMainMenu>(this, MenuClass);
 	if (!ensure(Menu)) { return; }
-	Menu->AddToViewport();
-
-	APlayerController* PlayerController = GetFirstLocalPlayerController();
-	if (!ensure(PlayerController)) { return; };
-
-	FInputModeUIOnly InputModeData;
-	// bShowMouseCursor only makes the cursor show up but if you play a standalone version of the game, the focus will not be on the menu widget by
-	// default which means that even when the cursor is hovering over the button, it won't interact with it unless you click on a button or UI first
-	// to change the focus to the widget. SetWidgetToFocus allows us to change that focus manually.
-	InputModeData.SetWidgetToFocus(Menu->TakeWidget());
-	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen); // Cursor can't go off the game's window in fullscreen mode.
-	PlayerController->SetInputMode(InputModeData);
-	PlayerController->bShowMouseCursor = true;
+	Menu->SetupMenu();
+	Menu->SetMenuInterface(this);
 }
 
 void UPP_GameInstance::Host()
