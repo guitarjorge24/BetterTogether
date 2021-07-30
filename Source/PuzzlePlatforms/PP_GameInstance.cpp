@@ -1,6 +1,7 @@
 // Copyright of Jorge Luque
 
 #include "PP_GameInstance.h"
+#include "MenuSystem/MenuBase.h"
 #include "MenuSystem/MainMenu.h"
 
 #include "PlatformTrigger.h"
@@ -15,6 +16,10 @@ UPP_GameInstance::UPP_GameInstance()
 	ConstructorHelpers::FClassFinder<UUserWidget> MenuWBPClass(TEXT("/Game/MenuSystem/WBP_MainMenu"));
 	if (!ensure(MenuWBPClass.Class)) { return; }
 	MenuClass = MenuWBPClass.Class;
+	
+	ConstructorHelpers::FClassFinder<UUserWidget> InGameMenuWBPClass(TEXT("/Game/MenuSystem/WBP_InGameMenu"));
+	if (!ensure(InGameMenuWBPClass.Class)) { return; }
+	InGameMenuClass = InGameMenuWBPClass.Class;
 }
 
 void UPP_GameInstance::Init()
@@ -29,6 +34,14 @@ void UPP_GameInstance::LoadMenu()
 	if (!ensure(Menu)) { return; }
 	Menu->SetupMenu();
 	Menu->SetMenuInterface(this);
+}
+
+void UPP_GameInstance::LoadInGameMenu()
+{
+	UMenuBase* InGameMenu = CreateWidget<UMenuBase>(this, InGameMenuClass);
+	if (!ensure(InGameMenu)) { return; }
+	InGameMenu->SetupMenu();
+	InGameMenu->SetMenuInterface(this);	
 }
 
 void UPP_GameInstance::Host()

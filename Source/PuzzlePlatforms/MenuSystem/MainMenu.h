@@ -1,41 +1,56 @@
 // Copyright of Jorge Luque
 
 #pragma once
-#include "MenuInterface.h"
 
+#include "MenuBase.h"
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
 
 #include "MainMenu.generated.h"
 
+class UButton;
+class UWidget;
+class UWidgetSwitcher;
+class UEditableTextBox;
 /**
  * 
  */
 UCLASS()
-class PUZZLEPLATFORMS_API UMainMenu : public UUserWidget
+class PUZZLEPLATFORMS_API UMainMenu : public UMenuBase
 {
 	GENERATED_BODY()
-
-public:
-	void SetMenuInterface(IMenuInterface* const InMenuInterface);
-	/** @brief Sets up InputMode and cursor visibility */
-	void SetupMenu();
 	
 protected:
 	virtual bool Initialize() override;
-	/** @brief Used to undo the stuff done by SetupMenu() */
-	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
-	
+
 private:
-	IMenuInterface* MenuInterface;
 	
 	UPROPERTY(meta=(BindWidget))
-	class UButton* HostButton;
+	UButton* HostButton;
 	UPROPERTY(meta=(BindWidget))
-	class UButton* JoinButton;
+	UButton* ToJoinMenuButton;
+	UPROPERTY(meta=(BindWidget))
+	UButton* JoinIPButton;
+	UPROPERTY(meta=(BindWidget))
+	UWidgetSwitcher* MenuSwitcher;
+	UPROPERTY(meta=(BindWidget))
+	UWidget* MatchModesMenuOverlay;
+	UPROPERTY(meta=(BindWidget))
+	UWidget* JoinMenuOverlay;
+	UPROPERTY(meta=(BindWidget))
+	UButton* BackToMatchModesButton;
+	UPROPERTY(meta=(BindWidget))
+	UEditableTextBox* IPTextBox;
+
+	UPROPERTY()
+	UWidget* PreviousWidget;
 
 	UFUNCTION()
 	void HostServer();
 	UFUNCTION()
+	void OpenJoinMenu();
+	UFUNCTION()
 	void JoinServer();
+	UFUNCTION()
+	void SwitchToPreviousMenu();
+	
 };
