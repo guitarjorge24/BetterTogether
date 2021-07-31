@@ -23,10 +23,12 @@ public:
 	/** @brief Sets up InputMode and cursor visibility */
 	void SetupMenu();
 
-
 protected:
 	IMenuInterface* MenuInterface;
 
 	/** @brief Used to undo the stuff done by SetupMenu() */
 	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
+
+	UFUNCTION()
+	virtual void RemoveMenu();
 };

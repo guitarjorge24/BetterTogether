@@ -19,17 +19,21 @@ public:
 	virtual void Init() override;
 
 	UFUNCTION(BlueprintCallable)
-	void LoadMenu();
+	void CreateMainMenuWidget();
 	UFUNCTION(BlueprintCallable)
 	void LoadInGameMenu();
+	
 	UFUNCTION(Exec)
 	virtual void Host() override;
 	UFUNCTION(Exec)
 	virtual void Join(const FString& IpAddress) override;
+	virtual void LoadMainMenuMap() override;
 
 	private:
-	TSubclassOf<class UUserWidget> MenuClass;
+	TSubclassOf<class UUserWidget> MainMenuClass;
 	TSubclassOf<class UUserWidget> InGameMenuClass;
 	UPROPERTY()
 	class UMainMenu* Menu;
+	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
+	class UInGameMenu* InGameMenu;
 };

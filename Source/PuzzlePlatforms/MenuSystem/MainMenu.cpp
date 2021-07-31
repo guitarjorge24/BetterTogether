@@ -9,7 +9,7 @@
 
 bool UMainMenu::Initialize()
 {
-	if (!Super::Initialize()) { return false; } // Return if base class failed to initialize
+	if (!ensure(Super::Initialize())) { return false; } // Return if base class failed to initialize
 
 	if (!ensure(HostButton)) { return false; }
 	HostButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
