@@ -31,16 +31,19 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	UButton* JoinIPButton;
 	UPROPERTY(meta=(BindWidget))
+	UButton* BackToMatchModesButton;
+	UPROPERTY(meta=(BindWidget))
+	UButton* QuitButton;
+	
+	UPROPERTY(meta=(BindWidget))
 	UWidgetSwitcher* MenuSwitcher;
 	UPROPERTY(meta=(BindWidget))
 	UWidget* MatchModesMenuOverlay;
 	UPROPERTY(meta=(BindWidget))
 	UWidget* JoinMenuOverlay;
 	UPROPERTY(meta=(BindWidget))
-	UButton* BackToMatchModesButton;
-	UPROPERTY(meta=(BindWidget))
 	UEditableTextBox* IPTextBox;
-
+	
 	UPROPERTY()
 	UWidget* PreviousWidget;
 
@@ -52,5 +55,7 @@ private:
 	void JoinServer();
 	UFUNCTION()
 	void SwitchToPreviousMenu();
+	UFUNCTION()
+	void QuitButtonPressed();
 	
 };

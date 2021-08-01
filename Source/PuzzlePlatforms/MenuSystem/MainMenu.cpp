@@ -13,15 +13,16 @@ bool UMainMenu::Initialize()
 
 	if (!ensure(HostButton)) { return false; }
 	HostButton->OnClicked.AddDynamic(this, &UMainMenu::HostServer);
-	
-	if(!ensure(JoinIPButton)) {return false;}
-	JoinIPButton->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
-
 	if (!ensure(ToJoinMenuButton)) { return false; }
 	ToJoinMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OpenJoinMenu);
 
+	if (!ensure(QuitButton)) { return false; }
+	QuitButton->OnClicked.AddDynamic(this, &UMainMenu::QuitButtonPressed);
+
 	if (!ensure(BackToMatchModesButton)) { return false; }
 	BackToMatchModesButton->OnClicked.AddDynamic(this, &UMainMenu::SwitchToPreviousMenu);
+	if (!ensure(JoinIPButton)) { return false; }
+	JoinIPButton->OnClicked.AddDynamic(this, &UMainMenu::JoinServer);
 
 	return true;
 }
@@ -54,4 +55,9 @@ void UMainMenu::SwitchToPreviousMenu()
 	if (!ensure(MenuSwitcher)) { return; }
 	if (!ensure(PreviousWidget)) { return; }
 	MenuSwitcher->SetActiveWidget(PreviousWidget);
+}
+
+void UMainMenu::QuitButtonPressed()
+{
+	GetOwningPlayer()->ConsoleCommand(TEXT("quit"));
 }
