@@ -11,7 +11,7 @@ void UInGameMenu::SetupInGameMenuInputComponent()
 	{
 		InGameMenuInputComponent->RegisterComponent();
 		InGameMenuInputComponent->bBlockInput = true;
-		InGameMenuInputComponent->BindAction(TEXT("OpenGameMenu"), IE_Pressed, this, &UInGameMenu::RemoveMenu);
+		InGameMenuInputComponent->BindAction(TEXT("OpenInGameMenu"), IE_Pressed, this, &UInGameMenu::RemoveMenu);
 		GetOwningPlayer()->PushInputComponent(InGameMenuInputComponent);
 	}
 }
