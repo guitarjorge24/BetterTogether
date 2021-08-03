@@ -4,7 +4,10 @@
 #include "MenuSystem/MenuInterface.h"
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Interfaces/OnlineSessionInterface.h"
+
 #include "PP_GameInstance.generated.h"
+
 
 /**
  * 
@@ -22,18 +25,29 @@ public:
 	void CreateMainMenuWidget();
 	UFUNCTION(BlueprintCallable)
 	void LoadInGameMenu();
+
 	
 	UFUNCTION(Exec)
-	virtual void Host() override;
+	virtual void HostLANServer() override;
 	UFUNCTION(Exec)
-	virtual void Join(const FString& IpAddress) override;
+	virtual void JoinLANServer(const FString& IpAddress) override;
+	UFUNCTION(Exec)
+	virtual void HostSteamServer() override;
 	virtual void LoadMainMenuMap() override;
 
-	private:
+private:
 	TSubclassOf<class UUserWidget> MainMenuClass;
 	TSubclassOf<class UUserWidget> InGameMenuClass;
 	UPROPERTY()
 	class UMainMenu* Menu;
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	class UInGameMenu* InGameMenu;
+	IOnlineSessionPtr SessionInterface; // can't be forward declared because IOnlineSessionPtr is a typedef defined in OnlineSessionInterface.h
+	
+	/**
+	* Delegate fired when a session create request has completed
+	* @param SessionName the name of the session this callback is for
+	* @param bWasSuccessful true if the async action completed without error, false if there was an error
+	*/
+	void OnCreateSession(FName SessionName,bool bWasSuccessful);
 };

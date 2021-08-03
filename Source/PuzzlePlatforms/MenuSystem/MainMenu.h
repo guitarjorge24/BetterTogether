@@ -18,23 +18,28 @@ UCLASS()
 class PUZZLEPLATFORMS_API UMainMenu : public UMenuBase
 {
 	GENERATED_BODY()
-	
+
 protected:
 	virtual bool Initialize() override;
 
 private:
-	
 	UPROPERTY(meta=(BindWidget))
-	UButton* HostButton;
+	UButton* LANHostButton;
 	UPROPERTY(meta=(BindWidget))
-	UButton* ToJoinMenuButton;
+	UButton* ToJoinIPMenuButton;
 	UPROPERTY(meta=(BindWidget))
 	UButton* JoinIPButton;
+
 	UPROPERTY(meta=(BindWidget))
+	UButton* SteamHostButton;
+	UPROPERTY(meta=(BindWidget))
+	UButton* ToJoinSteamMenuButton;
+	UPROPERTY(meta=(BindWidget))
+
 	UButton* BackToMatchModesButton;
 	UPROPERTY(meta=(BindWidget))
 	UButton* QuitButton;
-	
+
 	UPROPERTY(meta=(BindWidget))
 	UWidgetSwitcher* MenuSwitcher;
 	UPROPERTY(meta=(BindWidget))
@@ -43,19 +48,20 @@ private:
 	UWidget* JoinMenuOverlay;
 	UPROPERTY(meta=(BindWidget))
 	UEditableTextBox* IPTextBox;
-	
+
 	UPROPERTY()
 	UWidget* PreviousWidget;
 
 	UFUNCTION()
-	void HostServer();
+	void OnLANHostButtonClicked();
 	UFUNCTION()
-	void OpenJoinMenu();
+	void OnJoinIPMenuButtonClicked();
 	UFUNCTION()
-	void JoinServer();
+	void OnSteamHostButtonClicked();
+	UFUNCTION()
+	void OnJoinIPButtonClicked();
 	UFUNCTION()
 	void SwitchToPreviousMenu();
 	UFUNCTION()
-	void QuitButtonPressed();
-	
+	void QuitButtonClicked();
 };
