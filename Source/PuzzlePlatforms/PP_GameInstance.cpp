@@ -10,6 +10,8 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 
+const static FName k_SessionName("Steam Session");
+
 UPP_GameInstance::UPP_GameInstance()
 {
 	UE_LOG(LogTemp, Warning, TEXT("Constructor was called"));
@@ -36,7 +38,10 @@ void UPP_GameInstance::Init()
 
 		if (SessionInterface.IsValid())
 		{
-			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnCreateSession);
+			// If the class that contains the function that's being added to the delegate is a UObject class, then you would use AddUObject().
+			// UPP_GameInstance inherits from UGameInstance which inherits from UObject.
+			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnCreateSessionComplete);
+			SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnDestroySessionComplete);
 		}
 	}
 	else
@@ -91,27 +96,50 @@ void UPP_GameInstance::HostSteamServer()
 {
 	if (SessionInterface.IsValid())
 	{
-		FOnlineSessionSettings SessionSettings;
-		SessionInterface->CreateSession(0, TEXT("My Session Game"), SessionSettings);
+		FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(k_SessionName);
+		if (ExistingSession)
+		{
+			SessionInterface->DestroySession(k_SessionName);
+		}
+		else
+		{
+			CreateSession();
+		}
 	}
 }
 
-void UPP_GameInstance::OnCreateSession(FName SessionName, bool bWasSuccessful)
+void UPP_GameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	if (!bWasSuccessful)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Could not create session."));
+		UE_LOG(LogTemp, Warning, TEXT("Session creation failed."));
 		return;
 	}
-	
 	if (ensure(GEngine))
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Host Console Command Called!"));
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Session Creation Successful!"));
 	}
 
 	UWorld* World = GetWorld();
 	if (!ensure(World)) { return; }
 	World->ServerTravel("/Game/Maps/ThirdPersonExampleMap?listen"); // the ?listen parameter makes this client a listen server
+}
+
+void UPP_GameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		CreateSession();
+	}
+}
+
+void UPP_GameInstance::CreateSession()
+{
+	if (SessionInterface)
+	{
+		FOnlineSessionSettings SessionSettings;
+		SessionInterface->CreateSession(0, k_SessionName, SessionSettings);
+	}
 }
 
 void UPP_GameInstance::LoadMainMenuMap()
