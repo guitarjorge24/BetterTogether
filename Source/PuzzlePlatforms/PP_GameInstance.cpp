@@ -42,6 +42,15 @@ void UPP_GameInstance::Init()
 			// UPP_GameInstance inherits from UGameInstance which inherits from UObject.
 			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnCreateSessionComplete);
 			SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnDestroySessionComplete);
+			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnFindSessionsComplete);
+
+			SessionSearch = MakeShared<FOnlineSessionSearch>();
+			if (SessionSearch.IsValid())
+			{
+				SessionSearch->bIsLanQuery = true;
+				UE_LOG(LogTemp, Warning, TEXT("FindSessions search started at %f seconds."), GetWorld()->TimeSeconds)
+				SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
+			}
 		}
 	}
 	else
@@ -133,11 +142,27 @@ void UPP_GameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSucc
 	}
 }
 
+void UPP_GameInstance::OnFindSessionsComplete(bool bWasSuccessful)
+{
+	UE_LOG(LogTemp, Warning, TEXT("FindSessions search completed at %f seconds with a status of %d"), GetWorld()->TimeSeconds, bWasSuccessful);
+
+	if (bWasSuccessful && SessionSearch.IsValid())
+	{
+		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch.Get()->SearchResults)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Found Session with ID of: %s"), *SearchResult.GetSessionIdStr())
+		}
+	}
+}
+
 void UPP_GameInstance::CreateSession()
 {
 	if (SessionInterface)
 	{
 		FOnlineSessionSettings SessionSettings;
+		SessionSettings.bIsLANMatch = true;
+		SessionSettings.NumPublicConnections = 2;
+		SessionSettings.bShouldAdvertise = true;
 		SessionInterface->CreateSession(0, k_SessionName, SessionSettings);
 	}
 }
