@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/Button.h"
 #include "Components/EditableTextBox.h"
+#include "Components/TextBlock.h"
 #include "Components/WidgetSwitcher.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -82,6 +83,22 @@ void UMainMenu::OnJoinSteamMenuButtonClicked()
 	if (!ensure(JoinSteamMenuOverlay)) { return; }
 	PreviousWidget = MatchModesMenuOverlay;
 	MenuSwitcher->SetActiveWidget(JoinSteamMenuOverlay);
+	if (!ensure(MenuInterface)) { return; }
+	MenuInterface->RefreshServerList();
+}
+
+void UMainMenu::SetServerList(TArray<FString> ServerNames)
+{
+	ServerListScrollBox->ClearChildren();
+
+	for (const FString& ServerName : ServerNames)
+	{
+		UServerRow* ServerRowWidget = CreateWidget<UServerRow>(this, ServerRowClass);
+		if (!ensure(ServerRowWidget)) { return; }
+		ServerRowWidget->ServerName->SetText(FText::FromString(ServerName));
+		if (!ensure(ServerListScrollBox)) { return; }
+		ServerListScrollBox->AddChild(ServerRowWidget);
+	}
 }
 
 void UMainMenu::OnJoinIPButtonClicked()
@@ -94,9 +111,10 @@ void UMainMenu::OnJoinIPButtonClicked()
 
 void UMainMenu::OnJoinSteamSessionButtonClicked()
 {
-	UServerRow* ServerRowWidget = CreateWidget<UServerRow>(this, ServerRowClass);
-	if (!ensure(ServerListScrollBox)) { return; }
-	ServerListScrollBox->AddChild(ServerRowWidget);
+	// Join Steam Server (for now it joins LAN server until we have figured out Steam joining)
+	UE_LOG(LogTemp, Warning, TEXT("Join button on Steam Server List Menu pressed"))
+	if (!ensure(MenuInterface)) { return; }
+	MenuInterface->JoinSteamServer("127.0.0.1");
 }
 
 void UMainMenu::SwitchToPreviousMenu()

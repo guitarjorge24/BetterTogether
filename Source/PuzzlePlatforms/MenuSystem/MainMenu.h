@@ -21,6 +21,8 @@ class PUZZLEPLATFORMS_API UMainMenu : public UMenuBase
 
 public:
 	UMainMenu();
+	void SetServerList(TArray<FString> ServerNames);
+	
 protected:
 	virtual bool Initialize() override;
 
@@ -75,6 +77,7 @@ private:
 	void OnJoinIPMenuButtonClicked();
 	UFUNCTION()
 	void OnSteamHostButtonClicked();
+	/** Called when you click the button on the main menu that takes you to the list of sessions */
 	UFUNCTION()
 	void OnJoinSteamMenuButtonClicked();
 

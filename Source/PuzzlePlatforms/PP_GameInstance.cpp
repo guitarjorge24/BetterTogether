@@ -43,14 +43,6 @@ void UPP_GameInstance::Init()
 			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnCreateSessionComplete);
 			SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnDestroySessionComplete);
 			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnFindSessionsComplete);
-
-			SessionSearch = MakeShared<FOnlineSessionSearch>();
-			if (SessionSearch.IsValid())
-			{
-				SessionSearch->bIsLanQuery = true;
-				UE_LOG(LogTemp, Warning, TEXT("FindSessions search started at %f seconds."), GetWorld()->TimeSeconds)
-				SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
-			}
 		}
 	}
 	else
@@ -117,6 +109,13 @@ void UPP_GameInstance::HostSteamServer()
 	}
 }
 
+void UPP_GameInstance::JoinSteamServer(const FString& IpAddress)
+{
+	if (!ensure(Menu)) { return; }
+	// Menu->SetServerList({"Test 1", "Test 2"});
+	RefreshServerList();
+}
+
 void UPP_GameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
 {
 	if (!bWasSuccessful)
@@ -142,19 +141,6 @@ void UPP_GameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSucc
 	}
 }
 
-void UPP_GameInstance::OnFindSessionsComplete(bool bWasSuccessful)
-{
-	UE_LOG(LogTemp, Warning, TEXT("FindSessions search completed at %f seconds with a status of %d"), GetWorld()->TimeSeconds, bWasSuccessful);
-
-	if (bWasSuccessful && SessionSearch.IsValid())
-	{
-		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch.Get()->SearchResults)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Found Session with ID of: %s"), *SearchResult.GetSessionIdStr())
-		}
-	}
-}
-
 void UPP_GameInstance::CreateSession()
 {
 	if (SessionInterface)
@@ -165,6 +151,8 @@ void UPP_GameInstance::CreateSession()
 		SessionSettings.bShouldAdvertise = true;
 		SessionInterface->CreateSession(0, k_SessionName, SessionSettings);
 	}
+
+	// OnCreateSessionComplete() fires after this.
 }
 
 void UPP_GameInstance::LoadMainMenuMap()
@@ -173,4 +161,35 @@ void UPP_GameInstance::LoadMainMenuMap()
 	if (!ensure(PlayerController)) { return; }
 
 	PlayerController->ClientTravel("/Game/MenuSystem/MainMenu", ETravelType::TRAVEL_Absolute);
+}
+
+void UPP_GameInstance::RefreshServerList()
+{
+	SessionSearch = MakeShared<FOnlineSessionSearch>();
+
+	if (SessionSearch.IsValid() && SessionInterface.IsValid())
+	{
+		SessionSearch->bIsLanQuery = true; // Not necessary since it will not setting this to true just mean it will search for both Lan and non lan sessions.
+		UE_LOG(LogTemp, Warning, TEXT("FindSessions search started at %f seconds."), GetWorld()->TimeSeconds)
+		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
+	}
+}
+
+void UPP_GameInstance::OnFindSessionsComplete(bool bWasSuccessful)
+{
+	UE_LOG(LogTemp, Warning, TEXT("FindSessions search completed at %f seconds with a status of %d"), GetWorld()->TimeSeconds, bWasSuccessful);
+
+	if (bWasSuccessful && SessionSearch.IsValid())
+	{
+		TArray<FString> ServerNamesList;
+		
+		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch.Get()->SearchResults)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Found Session with ID of: %s"), *SearchResult.GetSessionIdStr())
+
+			ServerNamesList.Add(SearchResult.GetSessionIdStr());
+		}
+
+		Menu->SetServerList(ServerNamesList);
+	}
 }

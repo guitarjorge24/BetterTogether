@@ -33,7 +33,11 @@ public:
 	/** Called when SteamHostButton is clicked. Creates new session. If session already exists, destroys it which triggers OnDestroySessionComplete() */
 	UFUNCTION(Exec)
 	virtual void HostSteamServer() override;
+	UFUNCTION(Exec)
+	virtual void JoinSteamServer(const FString& IpAddress) override;
 	virtual void LoadMainMenuMap() override;
+
+	virtual void RefreshServerList() override;
 
 private:
 	TSubclassOf<class UUserWidget> MainMenuClass;

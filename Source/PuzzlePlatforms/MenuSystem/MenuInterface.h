@@ -25,6 +25,8 @@ public:
 	virtual void HostLANServer() = 0;
 	virtual void JoinLANServer(const FString& IpAddress) = 0;
 	virtual void HostSteamServer() = 0;
-	
+	virtual void JoinSteamServer(const FString& IpAddress) = 0;
+	virtual void RefreshServerList() = 0;
+
 	virtual void LoadMainMenuMap() = 0;
 };
