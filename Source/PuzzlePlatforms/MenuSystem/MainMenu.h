@@ -21,7 +21,10 @@ class PUZZLEPLATFORMS_API UMainMenu : public UMenuBase
 
 public:
 	UMainMenu();
+	/** Adds the found server names to the server list as ServerRow widgets */
 	void SetServerList(TArray<FString> ServerNames);
+	/** Sets the value of SelectedIndex after a server row is clicked*/
+	void SelectIndex(uint32 Index);
 	
 protected:
 	virtual bool Initialize() override;
@@ -66,6 +69,7 @@ private:
 	UEditableTextBox* IPTextBox;
 	UPROPERTY(meta=(BindWidget))
 	UPanelWidget* ServerListScrollBox;
+	TOptional<uint32> SelectedIndex;
 
 	UPROPERTY()
 	UWidget* PreviousWidget;
@@ -89,5 +93,5 @@ private:
 	UFUNCTION()
 	void SwitchToPreviousMenu();
 	UFUNCTION()
-	void QuitButtonClicked();
+	void OnQuitButtonClicked();
 };

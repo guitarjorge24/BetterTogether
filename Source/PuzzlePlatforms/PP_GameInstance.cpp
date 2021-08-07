@@ -43,6 +43,7 @@ void UPP_GameInstance::Init()
 			SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnCreateSessionComplete);
 			SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnDestroySessionComplete);
 			SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnFindSessionsComplete);
+			SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &UPP_GameInstance::OnJoinSessionComplete);
 		}
 	}
 	else
@@ -109,11 +110,13 @@ void UPP_GameInstance::HostSteamServer()
 	}
 }
 
-void UPP_GameInstance::JoinSteamServer(const FString& IpAddress)
+void UPP_GameInstance::JoinSteamServer(uint32 Index)
 {
-	if (!ensure(Menu)) { return; }
-	// Menu->SetServerList({"Test 1", "Test 2"});
-	RefreshServerList();
+	if (!ensure(SessionInterface.IsValid()) || !ensure(Menu) || !ensure(SessionSearch.IsValid())) { return; }
+	// Is it necessary to call Menu->RemoveMenu() ? It might already be called through OnLevelRemovedFromWorld when we try to join a session.
+	// Menu->RemoveMenu();
+
+	SessionInterface->JoinSession(0, k_SessionName, SessionSearch->SearchResults[Index]);
 }
 
 void UPP_GameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
@@ -169,7 +172,8 @@ void UPP_GameInstance::RefreshServerList()
 
 	if (SessionSearch.IsValid() && SessionInterface.IsValid())
 	{
-		SessionSearch->bIsLanQuery = true; // Not necessary since it will not setting this to true just mean it will search for both Lan and non lan sessions.
+		SessionSearch->bIsLanQuery = true;
+		// Not necessary since it will not setting this to true just mean it will search for both Lan and non lan sessions.
 		UE_LOG(LogTemp, Warning, TEXT("FindSessions search started at %f seconds."), GetWorld()->TimeSeconds)
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 	}
@@ -182,7 +186,7 @@ void UPP_GameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 	if (bWasSuccessful && SessionSearch.IsValid())
 	{
 		TArray<FString> ServerNamesList;
-		
+
 		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch.Get()->SearchResults)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Found Session with ID of: %s"), *SearchResult.GetSessionIdStr())
@@ -192,4 +196,22 @@ void UPP_GameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 
 		Menu->SetServerList(ServerNamesList);
 	}
+}
+
+void UPP_GameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+{
+	FString ConnectInfo; //The URL passed into ClientTravel
+	if (SessionInterface->GetResolvedConnectString(k_SessionName, ConnectInfo))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ConnectInfo: %s"), *ConnectInfo)
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Could not get ConnectInfo string"))
+		return;
+	}
+	
+	APlayerController* PlayerController = GetFirstLocalPlayerController();
+	if (!ensure(PlayerController)) { return; }
+	PlayerController->ClientTravel(ConnectInfo, ETravelType::TRAVEL_Absolute);
 }

@@ -29,6 +29,7 @@ protected:
 	/** @brief Used to undo the stuff done by SetupMenu() */
 	virtual void OnLevelRemovedFromWorld(ULevel* InLevel, UWorld* InWorld) override;
 
+	/** Removes from viewport, sets InputMode to GameOnly, hides cursor. */
 	UFUNCTION()
 	virtual void RemoveMenu();
 };

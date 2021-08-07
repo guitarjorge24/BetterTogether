@@ -34,7 +34,7 @@ public:
 	UFUNCTION(Exec)
 	virtual void HostSteamServer() override;
 	UFUNCTION(Exec)
-	virtual void JoinSteamServer(const FString& IpAddress) override;
+	virtual void JoinSteamServer(uint32 Index) override;
 	virtual void LoadMainMenuMap() override;
 
 	virtual void RefreshServerList() override;
@@ -63,5 +63,6 @@ private:
 	/** Delegate fired when a destroying an online session has completed. If destroying was successful, create a new session. */
 	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnFindSessionsComplete(bool bWasSuccessful);
+	void OnJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void CreateSession();
 };

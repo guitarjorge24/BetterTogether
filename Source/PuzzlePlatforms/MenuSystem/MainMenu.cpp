@@ -34,7 +34,7 @@ bool UMainMenu::Initialize()
 	ToJoinSteamMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OnJoinSteamMenuButtonClicked);
 
 	if (!ensure(QuitButton)) { return false; }
-	QuitButton->OnClicked.AddDynamic(this, &UMainMenu::QuitButtonClicked);
+	QuitButton->OnClicked.AddDynamic(this, &UMainMenu::OnQuitButtonClicked);
 
 	// Join IP Menu
 	if (!ensure(BackButtonInJoinIPMenu)) { return false; }
@@ -91,14 +91,22 @@ void UMainMenu::SetServerList(TArray<FString> ServerNames)
 {
 	ServerListScrollBox->ClearChildren();
 
+	uint32 ServerNamesIndex = 0;
 	for (const FString& ServerName : ServerNames)
 	{
 		UServerRow* ServerRowWidget = CreateWidget<UServerRow>(this, ServerRowClass);
 		if (!ensure(ServerRowWidget)) { return; }
 		ServerRowWidget->ServerName->SetText(FText::FromString(ServerName));
+		ServerRowWidget->SetParentAndIndex(this, ServerNamesIndex);
+		++ServerNamesIndex;
 		if (!ensure(ServerListScrollBox)) { return; }
 		ServerListScrollBox->AddChild(ServerRowWidget);
 	}
+}
+
+void UMainMenu::SelectIndex(uint32 Index)
+{
+	SelectedIndex = Index;
 }
 
 void UMainMenu::OnJoinIPButtonClicked()
@@ -113,8 +121,16 @@ void UMainMenu::OnJoinSteamSessionButtonClicked()
 {
 	// Join Steam Server (for now it joins LAN server until we have figured out Steam joining)
 	UE_LOG(LogTemp, Warning, TEXT("Join button on Steam Server List Menu pressed"))
-	if (!ensure(MenuInterface)) { return; }
-	MenuInterface->JoinSteamServer("127.0.0.1");
+
+	if(SelectedIndex.IsSet() && ensure(MenuInterface))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SelectedIndex: %d"), SelectedIndex.GetValue())
+		MenuInterface->JoinSteamServer(SelectedIndex.GetValue());
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SelectedIndex not set"))
+	}
 }
 
 void UMainMenu::SwitchToPreviousMenu()
@@ -124,7 +140,7 @@ void UMainMenu::SwitchToPreviousMenu()
 	MenuSwitcher->SetActiveWidget(PreviousWidget);
 }
 
-void UMainMenu::QuitButtonClicked()
+void UMainMenu::OnQuitButtonClicked()
 {
 	GetOwningPlayer()->ConsoleCommand(TEXT("quit"));
 }
