@@ -149,9 +149,10 @@ void UPP_GameInstance::CreateSession()
 	if (SessionInterface)
 	{
 		FOnlineSessionSettings SessionSettings;
-		SessionSettings.bIsLANMatch = true;
+		SessionSettings.bIsLANMatch = false; // Not needed for steam.
 		SessionSettings.NumPublicConnections = 2;
-		SessionSettings.bShouldAdvertise = true;
+		SessionSettings.bShouldAdvertise = true; // publicly advertise the match on the server
+		SessionSettings.bUsesPresence = true; // Required for Steam Lobby
 		SessionInterface->CreateSession(0, k_SessionName, SessionSettings);
 	}
 
@@ -172,8 +173,14 @@ void UPP_GameInstance::RefreshServerList()
 
 	if (SessionSearch.IsValid() && SessionInterface.IsValid())
 	{
-		SessionSearch->bIsLanQuery = true;
-		// Not necessary since it will not setting this to true just mean it will search for both Lan and non lan sessions.
+		// Even on LAN matches this is not necessary since not setting this to true just means it will search for both LAN and non LAN sessions.
+		// SessionSearch->bIsLanQuery = true;
+
+		// This adds another search rule/parameter to the query.
+		// In this search, only the sessions that have a SEARCH_PRESENCE that is Equals to true will show up in the search results.
+		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Type::Equals);
+		SessionSearch->MaxSearchResults = 200;
+
 		UE_LOG(LogTemp, Warning, TEXT("FindSessions search started at %f seconds."), GetWorld()->TimeSeconds)
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 	}
@@ -204,13 +211,14 @@ void UPP_GameInstance::OnJoinSessionComplete(FName SessionName, EOnJoinSessionCo
 	if (SessionInterface->GetResolvedConnectString(k_SessionName, ConnectInfo))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ConnectInfo: %s"), *ConnectInfo)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("ConnectInfo: %s"), *ConnectInfo));
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Could not get ConnectInfo string"))
 		return;
 	}
-	
+
 	APlayerController* PlayerController = GetFirstLocalPlayerController();
 	if (!ensure(PlayerController)) { return; }
 	PlayerController->ClientTravel(ConnectInfo, ETravelType::TRAVEL_Absolute);
