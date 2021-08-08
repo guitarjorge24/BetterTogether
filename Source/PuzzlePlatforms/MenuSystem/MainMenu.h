@@ -94,4 +94,5 @@ private:
 	void SwitchToPreviousMenu();
 	UFUNCTION()
 	void OnQuitButtonClicked();
+	void UpdateChildren(TOptional<uint32> PreviousIndexOptional, int32 CurrentIndex);
 };

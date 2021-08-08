@@ -18,7 +18,9 @@ class PUZZLEPLATFORMS_API UServerRow : public UUserWidget
 public:
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* ServerName;
-
+	UPROPERTY(BlueprintReadOnly)
+	bool bIsSelected = false;
+	
 	/**
  	* @brief Sets the parent menu and row index. 
  	* @param InParentMainMenu The main menu widget that contains the scrollbox upon which the ServerRows are added to as children

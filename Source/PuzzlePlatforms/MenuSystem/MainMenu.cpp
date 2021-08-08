@@ -106,8 +106,28 @@ void UMainMenu::SetServerList(TArray<FString> ServerNames)
 
 void UMainMenu::SelectIndex(uint32 Index)
 {
+	UpdateChildren(SelectedIndex, Index);
 	SelectedIndex = Index;
 }
+
+void UMainMenu::UpdateChildren(TOptional<uint32> PreviousIndexOptional, int32 CurrentIndex)
+{
+	if(!PreviousIndexOptional.IsSet())
+	{
+		auto CurrentRow = Cast<UServerRow>(ServerListScrollBox->GetChildAt(CurrentIndex));
+		CurrentRow->bIsSelected = true;
+		return;
+	}
+	
+	if (PreviousIndexOptional == CurrentIndex) { return; }
+
+	auto PreviousRow = Cast<UServerRow>(ServerListScrollBox->GetChildAt(PreviousIndexOptional.GetValue()));
+	PreviousRow->bIsSelected = false;
+
+	auto CurrentRow = Cast<UServerRow>(ServerListScrollBox->GetChildAt(CurrentIndex));
+	CurrentRow->bIsSelected = true;
+}
+
 
 void UMainMenu::OnJoinIPButtonClicked()
 {
@@ -122,7 +142,7 @@ void UMainMenu::OnJoinSteamSessionButtonClicked()
 	// Join Steam Server (for now it joins LAN server until we have figured out Steam joining)
 	UE_LOG(LogTemp, Warning, TEXT("Join button on Steam Server List Menu pressed"))
 
-	if(SelectedIndex.IsSet() && ensure(MenuInterface))
+	if (SelectedIndex.IsSet() && ensure(MenuInterface))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("SelectedIndex: %d"), SelectedIndex.GetValue())
 		MenuInterface->JoinSteamServer(SelectedIndex.GetValue());

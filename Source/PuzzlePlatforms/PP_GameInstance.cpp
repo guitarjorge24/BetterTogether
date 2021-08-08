@@ -194,6 +194,11 @@ void UPP_GameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 	{
 		TArray<FString> ServerNamesList;
 
+		// Used for previewing what server entries look like
+		ServerNamesList.Add("Test Server 1");
+		ServerNamesList.Add("Test Server 2");
+		ServerNamesList.Add("Test Server 3");
+
 		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch.Get()->SearchResults)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Found Session with ID of: %s"), *SearchResult.GetSessionIdStr())
