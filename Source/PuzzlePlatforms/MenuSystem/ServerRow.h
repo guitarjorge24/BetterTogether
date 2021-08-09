@@ -18,6 +18,11 @@ class PUZZLEPLATFORMS_API UServerRow : public UUserWidget
 public:
 	UPROPERTY(meta=(BindWidget))
 	class UTextBlock* ServerName;
+	UPROPERTY(meta=(BindWidget))
+	class UTextBlock* HostUserName;
+	UPROPERTY(meta=(BindWidget))
+	class UTextBlock* NumberOfPlayersFraction;
+	
 	UPROPERTY(BlueprintReadOnly)
 	bool bIsSelected = false;
 	

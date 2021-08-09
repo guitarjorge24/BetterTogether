@@ -87,18 +87,23 @@ void UMainMenu::OnJoinSteamMenuButtonClicked()
 	MenuInterface->RefreshServerList();
 }
 
-void UMainMenu::SetServerList(TArray<FString> ServerNames)
+void UMainMenu::SetServerList(TArray<FServerData> ServerDataList)
 {
 	ServerListScrollBox->ClearChildren();
 
 	uint32 ServerNamesIndex = 0;
-	for (const FString& ServerName : ServerNames)
+	for (const FServerData& ServerData : ServerDataList)
 	{
 		UServerRow* ServerRowWidget = CreateWidget<UServerRow>(this, ServerRowClass);
 		if (!ensure(ServerRowWidget)) { return; }
-		ServerRowWidget->ServerName->SetText(FText::FromString(ServerName));
+
+		ServerRowWidget->ServerName->SetText(FText::FromString(ServerData.Name));
+		ServerRowWidget->HostUserName->SetText(FText::FromString(ServerData.HostUserName));
+		FString FractionText = FString::Printf(TEXT("%d/%d"), ServerData.CurrentPlayersCount, ServerData.MaxNumberOfPlayers);
+		ServerRowWidget->NumberOfPlayersFraction->SetText(FText::FromString(FractionText));
 		ServerRowWidget->SetParentAndIndex(this, ServerNamesIndex);
 		++ServerNamesIndex;
+
 		if (!ensure(ServerListScrollBox)) { return; }
 		ServerListScrollBox->AddChild(ServerRowWidget);
 	}
@@ -112,13 +117,13 @@ void UMainMenu::SelectIndex(uint32 Index)
 
 void UMainMenu::UpdateChildren(TOptional<uint32> PreviousIndexOptional, int32 CurrentIndex)
 {
-	if(!PreviousIndexOptional.IsSet())
+	if (!PreviousIndexOptional.IsSet())
 	{
 		auto CurrentRow = Cast<UServerRow>(ServerListScrollBox->GetChildAt(CurrentIndex));
 		CurrentRow->bIsSelected = true;
 		return;
 	}
-	
+
 	if (PreviousIndexOptional == CurrentIndex) { return; }
 
 	auto PreviousRow = Cast<UServerRow>(ServerListScrollBox->GetChildAt(PreviousIndexOptional.GetValue()));

@@ -11,9 +11,19 @@ class UButton;
 class UWidget;
 class UWidgetSwitcher;
 class UEditableTextBox;
-/**
- * 
- */
+
+USTRUCT()
+struct FServerData
+{
+	GENERATED_BODY()
+	
+	FString Name;
+	uint16 CurrentPlayersCount;
+	uint16 MaxNumberOfPlayers;
+	FString HostUserName;
+};
+
+/** Class used as parent for WBP_MainMenu */
 UCLASS()
 class PUZZLEPLATFORMS_API UMainMenu : public UMenuBase
 {
@@ -22,7 +32,7 @@ class PUZZLEPLATFORMS_API UMainMenu : public UMenuBase
 public:
 	UMainMenu();
 	/** Adds the found server names to the server list as ServerRow widgets */
-	void SetServerList(TArray<FString> ServerNames);
+	void SetServerList(TArray<FServerData> ServerDataList);
 	/** Sets the value of SelectedIndex after a server row is clicked*/
 	void SelectIndex(uint32 Index);
 	

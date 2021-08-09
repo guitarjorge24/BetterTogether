@@ -149,10 +149,13 @@ void UPP_GameInstance::CreateSession()
 	if (SessionInterface)
 	{
 		FOnlineSessionSettings SessionSettings;
-		SessionSettings.bIsLANMatch = false; // Not needed for steam.
+
+		// Set bIsLANMatch to false when using the Steam OSS but set to true when testing with the NULL OSS which can only do LAN matches.
+		SessionSettings.bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL";
 		SessionSettings.NumPublicConnections = 2;
 		SessionSettings.bShouldAdvertise = true; // publicly advertise the match on the server
 		SessionSettings.bUsesPresence = true; // Required for Steam Lobby
+		// SessionSettings.NumPublicConnections = 2; // Set max number of players that can join the session
 		SessionInterface->CreateSession(0, k_SessionName, SessionSettings);
 	}
 
@@ -192,21 +195,28 @@ void UPP_GameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 
 	if (bWasSuccessful && SessionSearch.IsValid())
 	{
-		TArray<FString> ServerNamesList;
+		TArray<FServerData> ServerDataList;
 
-		// Used for previewing what server entries look like
-		ServerNamesList.Add("Test Server 1");
-		ServerNamesList.Add("Test Server 2");
-		ServerNamesList.Add("Test Server 3");
+		// #Debug: Used for previewing what server entries look like without needing to host multiple sessions.
+		// ServerNamesList.Add("Test Server 1");
+		// ServerNamesList.Add("Test Server 2");
+		// ServerNamesList.Add("Test Server 3");
 
 		for (const FOnlineSessionSearchResult& SearchResult : SessionSearch.Get()->SearchResults)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Found Session with ID of: %s"), *SearchResult.GetSessionIdStr())
 
-			ServerNamesList.Add(SearchResult.GetSessionIdStr());
+			FServerData ServerData;
+			ServerData.Name = SearchResult.GetSessionIdStr();
+			ServerData.CurrentPlayersCount = SearchResult.Session.NumOpenPublicConnections;
+			ServerData.MaxNumberOfPlayers = SearchResult.Session.SessionSettings.NumPublicConnections;
+			ServerData.HostUserName = SearchResult.Session.OwningUserName;
+			
+			ServerDataList.Add(ServerData);
+
 		}
 
-		Menu->SetServerList(ServerNamesList);
+		Menu->SetServerList(ServerDataList);
 	}
 }
 
