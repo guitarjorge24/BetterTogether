@@ -42,47 +42,56 @@ protected:
 private:
 	TSubclassOf<class UUserWidget> ServerRowClass;
 	
+	// Main Menu Widget
+	UPROPERTY(meta=(BindWidget))
+	UWidgetSwitcher* MenuSwitcher;
+	UPROPERTY()
+	UWidget* PreviousWidget;
+	UPROPERTY(meta=(BindWidget))
+	UWidget* MatchModesMenuOverlay;
+	UPROPERTY(meta=(BindWidget))
+	UButton* QuitButton;
 	// LAN Host/Join Buttons
 	UPROPERTY(meta=(BindWidget))
 	UButton* LANHostButton;
 	UPROPERTY(meta=(BindWidget))
 	UButton* ToJoinIPMenuButton;
-	UPROPERTY(meta=(BindWidget))
-	UButton* JoinIPButton;
-
 	// Steam Host/Join Buttons
 	UPROPERTY(meta=(BindWidget))
-	UButton* SteamHostButton;
+	UButton* SteamHostButtonInMainMenu;
 	UPROPERTY(meta=(BindWidget))
 	UButton* ToJoinSteamMenuButton;
+	
+	// Steam Server Name Host Menu
 	UPROPERTY(meta=(BindWidget))
-	UButton* JoinSteamSessionButton;
+	UWidget* SteamServerNameMenuOverlay;
+	UPROPERTY(meta=(BindWidget))
+	UEditableTextBox* ServerNameTextBox;
+	UPROPERTY(meta=(BindWidget))
+	UButton* HostButtonInServerNameMenu;
+	UPROPERTY(meta=(BindWidget))
+	UButton* BackButtonInServerNameMenu;
 
-	// Back/Quit Buttons
-	UPROPERTY(meta=(BindWidget))
-	UButton* BackButtonInJoinIPMenu;
-	UPROPERTY(meta=(BindWidget))
-	UButton* BackButtonInSteamJoinMenu;
-	UPROPERTY(meta=(BindWidget))
-	UButton* QuitButton;
-
-	// Main Menu Widgets
-	UPROPERTY(meta=(BindWidget))
-	UWidgetSwitcher* MenuSwitcher;
-	UPROPERTY(meta=(BindWidget))
-	UWidget* MatchModesMenuOverlay;
+	// Join IP Menu
 	UPROPERTY(meta=(BindWidget))
 	UWidget* JoinIPMenuOverlay;
 	UPROPERTY(meta=(BindWidget))
-	UWidget* JoinSteamMenuOverlay;
-	UPROPERTY(meta=(BindWidget))
 	UEditableTextBox* IPTextBox;
+	UPROPERTY(meta=(BindWidget))
+	UButton* JoinIPButton;
+	UPROPERTY(meta=(BindWidget))
+	UButton* BackButtonInJoinIPMenu;
+
+	// Join Steam Server Menu
+	UPROPERTY(meta=(BindWidget))
+	UWidget* JoinSteamMenuOverlay;
 	UPROPERTY(meta=(BindWidget))
 	UPanelWidget* ServerListScrollBox;
 	TOptional<uint32> SelectedIndex;
-
-	UPROPERTY()
-	UWidget* PreviousWidget;
+	UPROPERTY(meta=(BindWidget))
+	UButton* JoinSteamSessionButton;
+	UPROPERTY(meta=(BindWidget))
+	UButton* BackButtonInSteamJoinMenu;
 
 	UFUNCTION()
 	void OnLANHostButtonClicked();
@@ -95,7 +104,8 @@ private:
 	UFUNCTION()
 	void OnJoinSteamMenuButtonClicked();
 
-
+	UFUNCTION()
+	void OnHostButtonInServerNameMenuClicked();
 	UFUNCTION()
 	void OnJoinIPButtonClicked();
 	UFUNCTION()

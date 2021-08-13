@@ -28,8 +28,8 @@ bool UMainMenu::Initialize()
 	LANHostButton->OnClicked.AddDynamic(this, &UMainMenu::OnLANHostButtonClicked);
 	if (!ensure(ToJoinIPMenuButton)) { return false; }
 	ToJoinIPMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OnJoinIPMenuButtonClicked);
-	if (!ensure(SteamHostButton)) { return false; }
-	SteamHostButton->OnClicked.AddDynamic(this, &UMainMenu::OnSteamHostButtonClicked);
+	if (!ensure(SteamHostButtonInMainMenu)) { return false; }
+	SteamHostButtonInMainMenu->OnClicked.AddDynamic(this, &UMainMenu::OnSteamHostButtonClicked);
 	if (!ensure(ToJoinSteamMenuButton)) { return false; }
 	ToJoinSteamMenuButton->OnClicked.AddDynamic(this, &UMainMenu::OnJoinSteamMenuButtonClicked);
 
@@ -42,6 +42,12 @@ bool UMainMenu::Initialize()
 	if (!ensure(JoinIPButton)) { return false; }
 	JoinIPButton->OnClicked.AddDynamic(this, &UMainMenu::OnJoinIPButtonClicked);
 
+	// Steam Server Name Menu
+	if (!ensure(HostButtonInServerNameMenu)) { return false; }
+	HostButtonInServerNameMenu->OnClicked.AddDynamic(this, &UMainMenu::OnHostButtonInServerNameMenuClicked);
+	if (!ensure(BackButtonInServerNameMenu)) { return false; }
+	BackButtonInServerNameMenu->OnClicked.AddDynamic(this, &UMainMenu::SwitchToPreviousMenu);
+	
 	// Join Steam Session Menu
 	if (!ensure(BackButtonInSteamJoinMenu)) { return false; }
 	BackButtonInSteamJoinMenu->OnClicked.AddDynamic(this, &UMainMenu::SwitchToPreviousMenu);
@@ -70,9 +76,8 @@ void UMainMenu::OnJoinIPMenuButtonClicked()
 
 void UMainMenu::OnSteamHostButtonClicked()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Steam Host button pressed"))
-	if (!ensure(MenuInterface)) { return; }
-	MenuInterface->HostSteamServer();
+	PreviousWidget = MatchModesMenuOverlay;
+	MenuSwitcher->SetActiveWidget(SteamServerNameMenuOverlay);
 }
 
 void UMainMenu::OnJoinSteamMenuButtonClicked()
@@ -85,6 +90,14 @@ void UMainMenu::OnJoinSteamMenuButtonClicked()
 	MenuSwitcher->SetActiveWidget(JoinSteamMenuOverlay);
 	if (!ensure(MenuInterface)) { return; }
 	MenuInterface->RefreshServerList();
+}
+
+void UMainMenu::OnHostButtonInServerNameMenuClicked()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Steam Host button pressed"))
+	if (!ensure(MenuInterface)) { return; }
+	const FString ServerName = ServerNameTextBox->GetText().ToString();
+	MenuInterface->HostSteamServer(ServerName);
 }
 
 void UMainMenu::SetServerList(TArray<FServerData> ServerDataList)

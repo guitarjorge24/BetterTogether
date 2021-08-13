@@ -24,7 +24,7 @@ class PUZZLEPLATFORMS_API IMenuInterface
 public:
 	virtual void HostLANServer() = 0;
 	virtual void JoinLANServer(const FString& IpAddress) = 0;
-	virtual void HostSteamServer() = 0;
+	virtual void HostSteamServer(FString ServerName) = 0;
 	virtual void JoinSteamServer(uint32 Index) = 0;
 	virtual void RefreshServerList() = 0;
 

@@ -32,7 +32,7 @@ public:
 	virtual void JoinLANServer(const FString& IpAddress) override;
 	/** Called when SteamHostButton is clicked. Creates new session. If session already exists, destroys it which triggers OnDestroySessionComplete() */
 	UFUNCTION(Exec)
-	virtual void HostSteamServer() override;
+	virtual void HostSteamServer(FString ServerName) override;
 	UFUNCTION(Exec)
 	virtual void JoinSteamServer(uint32 Index) override;
 	virtual void LoadMainMenuMap() override;
@@ -47,6 +47,7 @@ private:
 	UPROPERTY(BlueprintReadOnly, meta=(AllowPrivateAccess="true"))
 	class UInGameMenu* InGameMenu;
 	IOnlineSessionPtr SessionInterface; // can't be forward declared because IOnlineSessionPtr is a typedef defined in OnlineSessionInterface.h
+	FString DesiredServerName;
 
 	// Old method of creating the TSharedRef variable. I switched to creating a TSharedPtr and then converting to Ref when needed with ToSharedRef().
 	// TSharedRef<FOnlineSessionSearch> can't be forward declared because the default constructor for TSharedRef<> does "new".

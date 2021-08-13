@@ -11,6 +11,7 @@
 #include "OnlineSubsystem.h"
 
 const static FName k_SessionName("Steam Session");
+const static FName k_ServerNameSettingsKey("ServerName");
 
 UPP_GameInstance::UPP_GameInstance()
 {
@@ -94,8 +95,9 @@ void UPP_GameInstance::JoinLANServer(const FString& IpAddress)
 	PlayerController->ClientTravel(IpAddress, ETravelType::TRAVEL_Absolute);
 }
 
-void UPP_GameInstance::HostSteamServer()
+void UPP_GameInstance::HostSteamServer(FString ServerName)
 {
+	DesiredServerName = ServerName;
 	if (SessionInterface.IsValid())
 	{
 		FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(k_SessionName);
@@ -155,6 +157,7 @@ void UPP_GameInstance::CreateSession()
 		SessionSettings.NumPublicConnections = 2; // Sets the max player number in the session
 		SessionSettings.bShouldAdvertise = true; // publicly advertise the match on the server
 		SessionSettings.bUsesPresence = true; // Required for Steam Lobby
+		SessionSettings.Set(k_ServerNameSettingsKey, DesiredServerName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 		SessionInterface->CreateSession(0, k_SessionName, SessionSettings);
 	}
 
@@ -211,6 +214,17 @@ void UPP_GameInstance::OnFindSessionsComplete(bool bWasSuccessful)
 			// NumOpenPublicConnections is the num of available connections left in the session
 			ServerData.CurrentPlayersCount = ServerData.MaxNumberOfPlayers - SearchResult.Session.NumOpenPublicConnections;
 			ServerData.HostUserName = SearchResult.Session.OwningUserName;
+			FString ServerName;
+			if (SearchResult.Session.SessionSettings.Get(k_ServerNameSettingsKey, ServerName)) // if key for servername is found
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Found ServerName Key: %s"), *ServerName);
+				ServerData.Name = ServerName;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Didn't get expected data"));
+				ServerData.Name = "Could not find name.";
+			}
 			
 			ServerDataList.Add(ServerData);
 
