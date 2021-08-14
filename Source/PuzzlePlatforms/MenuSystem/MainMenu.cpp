@@ -124,12 +124,13 @@ void UMainMenu::SetServerList(TArray<FServerData> ServerDataList)
 
 void UMainMenu::SelectIndex(uint32 Index)
 {
-	UpdateChildren(SelectedIndex, Index);
+	UpdateSelectedStatus(SelectedIndex, Index);
 	SelectedIndex = Index;
 }
 
-void UMainMenu::UpdateChildren(TOptional<uint32> PreviousIndexOptional, int32 CurrentIndex)
+void UMainMenu::UpdateSelectedStatus(TOptional<uint32> PreviousIndexOptional, int32 CurrentIndex)
 {
+	// if PreviousIndex hasn't been set we want to just make the current index be selected
 	if (!PreviousIndexOptional.IsSet())
 	{
 		auto CurrentRow = Cast<UServerRow>(ServerListScrollBox->GetChildAt(CurrentIndex));
@@ -137,8 +138,10 @@ void UMainMenu::UpdateChildren(TOptional<uint32> PreviousIndexOptional, int32 Cu
 		return;
 	}
 
+	// if there's no update required
 	if (PreviousIndexOptional == CurrentIndex) { return; }
 
+	// otherwise make the old index no longer selected and the current index selected
 	auto PreviousRow = Cast<UServerRow>(ServerListScrollBox->GetChildAt(PreviousIndexOptional.GetValue()));
 	PreviousRow->bIsSelected = false;
 
