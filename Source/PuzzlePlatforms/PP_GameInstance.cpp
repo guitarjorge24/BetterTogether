@@ -79,7 +79,7 @@ void UPP_GameInstance::HostLANServer()
 
 	UWorld* World = GetWorld();
 	if (!ensure(World)) { return; }
-	World->ServerTravel("/Game/Maps/ThirdPersonExampleMap?listen"); // the ?listen parameter makes this client a listen server
+	World->ServerTravel("/Game/Maps/Game?listen"); // the ?listen parameter makes this client a listen server
 }
 
 void UPP_GameInstance::JoinLANServer(const FString& IpAddress)
@@ -135,7 +135,7 @@ void UPP_GameInstance::OnCreateSessionComplete(FName SessionName, bool bWasSucce
 
 	UWorld* World = GetWorld();
 	if (!ensure(World)) { return; }
-	World->ServerTravel("/Game/Maps/ThirdPersonExampleMap?listen"); // the ?listen parameter makes this client a listen server
+	World->ServerTravel("/Game/Maps/Lobby?listen"); // the ?listen parameter makes this client a listen server
 }
 
 void UPP_GameInstance::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
