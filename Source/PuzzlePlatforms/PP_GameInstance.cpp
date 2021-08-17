@@ -10,7 +10,7 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 
-const static FName k_SessionName("Steam Session");
+const static FName k_SessionName(NAME_GameSession);
 const static FName k_ServerNameSettingsKey("ServerName");
 
 UPP_GameInstance::UPP_GameInstance()
