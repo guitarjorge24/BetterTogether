@@ -154,7 +154,7 @@ void UPP_GameInstance::CreateSession()
 
 		// Set bIsLANMatch to false when using the Steam OSS but set to true when testing with the NULL OSS which can only do LAN matches.
 		SessionSettings.bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL";
-		SessionSettings.NumPublicConnections = 2; // Sets the max player number in the session
+		SessionSettings.NumPublicConnections = 3; // Sets the max player number in the session
 		SessionSettings.bShouldAdvertise = true; // publicly advertise the match on the server
 		SessionSettings.bUsesPresence = true; // Required for Steam Lobby
 		SessionSettings.Set(k_ServerNameSettingsKey, DesiredServerName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
@@ -188,6 +188,15 @@ void UPP_GameInstance::RefreshServerList()
 
 		UE_LOG(LogTemp, Warning, TEXT("FindSessions search started at %f seconds."), GetWorld()->TimeSeconds)
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
+	}
+}
+
+void UPP_GameInstance::StartSession()
+{
+	if(SessionInterface.IsValid())
+	{
+		// this is important so that matches don't show up on the FindMatch search results once they are already in progress.
+		SessionInterface->StartSession(k_SessionName);
 	}
 }
 

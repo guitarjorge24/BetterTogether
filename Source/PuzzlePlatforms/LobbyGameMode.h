@@ -21,4 +21,6 @@ public:
 private:
 	uint8 PlayerCount = 0;
 	uint8 MaxPlayersNum = 3;
+	FTimerHandle StartMatchTimerHandle;
+	void StartGame();
 };

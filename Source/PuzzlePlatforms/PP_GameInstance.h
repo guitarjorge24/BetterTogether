@@ -38,6 +38,7 @@ public:
 	virtual void LoadMainMenuMap() override;
 
 	virtual void RefreshServerList() override;
+	void StartSession();
 
 private:
 	TSubclassOf<class UUserWidget> MainMenuClass;
