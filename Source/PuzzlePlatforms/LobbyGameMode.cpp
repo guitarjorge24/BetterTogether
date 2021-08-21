@@ -29,7 +29,7 @@ void ALobbyGameMode::Logout(AController* Exiting)
 void ALobbyGameMode::StartGame()
 {
 	auto GameInstance = Cast<UPP_GameInstance>(GetGameInstance());
-	if (!ensure(GameInstance))
+	if (ensure(GameInstance))
 	{
 		GameInstance->StartSession();
 	}

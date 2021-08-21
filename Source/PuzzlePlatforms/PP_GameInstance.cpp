@@ -51,6 +51,11 @@ void UPP_GameInstance::Init()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("OSS was NULL"));
 	}
+
+	if(ensure(GEngine))
+	{
+		GEngine->OnNetworkFailure().AddUObject(this, &UPP_GameInstance::OnNetworkFailure);
+	}
 }
 
 void UPP_GameInstance::CreateMainMenuWidget()
@@ -162,6 +167,11 @@ void UPP_GameInstance::CreateSession()
 	}
 
 	// OnCreateSessionComplete() fires after this.
+}
+
+void UPP_GameInstance::OnNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString)
+{
+	LoadMainMenuMap();
 }
 
 void UPP_GameInstance::LoadMainMenuMap()
